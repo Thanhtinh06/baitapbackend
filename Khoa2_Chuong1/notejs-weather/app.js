@@ -24,7 +24,44 @@ const getWeather = async (location) => {
             error
         }
     }
-
 }
 
-getWeather("tokyo");
+//http://localhost:3000/
+
+// getWeather("tokyo");
+const express = require("express");
+const app = express();
+const path = require("path");
+
+//set static file (public)
+const pathPublic = path.join(__dirname,"./public");
+app.use(express.static(pathPublic));
+
+app.set("view engine","hbs"); //pug => công nghệ render server side render
+
+app.get("/", async (request, respone) => {
+    const params =  request.query;
+    const location = params.address;
+    const weather = await getWeather(location);
+    if(location){
+        respone.render('weather',{
+            status: true,
+            region : weather.region,
+            country: weather.country,
+            temperature : weather.temperature,
+            wind_speed : weather.wind_speed,
+            precip : weather.precip,
+            cloudcover : weather.cloudcover
+        })
+    }else{
+        respone.render('weather'),{
+            status:false
+        }
+    }
+
+})
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`app run on port http://localhost:${port}`);
+})
